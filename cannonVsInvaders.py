@@ -39,6 +39,7 @@ class Ball:
         self.velocity_y = velocity_y
         self.shape_radius = Ball.shape_radius
         self.color = Ball.color
+        self.active = True
 
     def move(self, tick):
         self.x += self.velocity_x * tick
@@ -46,25 +47,34 @@ class Ball:
         self.velocity_y += GRAVITY * tick
         self.bounce()
 
-    def collide(self, target: Target):
-        pass
+    def collide(self, targets):
+        index_of_collide = -1
+
+        for i, target in enumerate(targets):
+            if (self.x - target.x) ** 2 + (self.y - target.y) ** 2 <= (self.shape_radius + target.shape_radius) ** 2:
+                index_of_collide = i
+                break
+
+        if index_of_collide != -1:
+            targets.pop(index_of_collide)
+            self.active = False
 
     def draw(self, screen):
         pygame.draw.circle(screen, self.color, (self.x, self.y), self.shape_radius)
 
     def bounce(self):
         if self.x < self.shape_radius:
-            self.velocity_x = abs(self.velocity_x) * 0.6
-            self.velocity_y *= 0.6
+            self.velocity_x = abs(self.velocity_x) * 0.9
+            self.velocity_y *= 0.9
         if self.x > WIDTH - self.shape_radius:
-            self.velocity_x = -abs(self.velocity_x) * 0.6
-            self.velocity_y *= 0.6
+            self.velocity_x = -abs(self.velocity_x) * 0.9
+            self.velocity_y *= 0.9
         if self.y < self.shape_radius:
-            self.velocity_y = abs(self.velocity_y) * 0.6
-            self.velocity_x *= 0.6
+            self.velocity_y = abs(self.velocity_y) * 0.9
+            self.velocity_x *= 0.9
         if self.y > HEIGHT - self.shape_radius:
-            self.velocity_y = -abs(self.velocity_y) * 0.6
-            self.velocity_x *= 0.6
+            self.velocity_y = -abs(self.velocity_y) * 0.9
+            self.velocity_x *= 0.9
 
         if abs(self.velocity_x) < 10:
             self.velocity_x = 0
@@ -149,9 +159,9 @@ def update_objects(cannon: Cannon, balls, targets, tick):
         target.move()
 
     for ball in balls:
-        ball.move(tick)
-        for target in targets:
-            ball.collide(target)
+        if ball.active:
+            ball.move(tick)
+            ball.collide(targets)
 
     cannon.move()
 
@@ -160,7 +170,8 @@ def draw_objects(screen, cannon: Cannon, balls, targets):
     screen.fill((120, 120, 120))
 
     for ball in balls:
-        ball.draw(screen)
+        if ball.active:
+            ball.draw(screen)
 
     for target in targets:
         target.draw(screen)
