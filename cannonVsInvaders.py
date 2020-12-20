@@ -54,17 +54,28 @@ class Ball:
 
 class Cannon:
     color = (50, 50, 50)
+    speed = 10
 
     def __init__(self, x: int, y: int, fire_power: float):
         self.x = x
         self.y = y
+        self.width = 60
+        self.height = 30
         self.fire_power = fire_power
+        self.speed = Cannon.speed
         self.color = Cannon.color
         self.aim_x = x
         self.aim_y = y
+        self.direction = 0
 
-    def move(self, direction):
-        pass
+    def move(self):
+        new_x = self.x + self.direction * self.speed
+        if new_x < 0:
+            self.x = 0
+        elif new_x > WIDTH - self.width:
+            self.x = WIDTH - self.width
+        else:
+            self.x = new_x
 
     def aim(self, position):
         pass
@@ -73,7 +84,8 @@ class Cannon:
         pass
 
     def draw(self, screen):
-        pass
+        pygame.draw.rect(screen, self.color, (self.x, self.y + self.height // 2, self.width, self.height // 2))         # base of cannon
+        pygame.draw.circle(screen, self.color, (self.x + self.width // 2, self.y + self.height // 2), self.height // 2) # sphere of cannon
 
 
 def generate_targets(targets, count=10):
@@ -88,6 +100,17 @@ def input_handler(events, cannon: Cannon):
     for event in events:
         if event.type == pygame.QUIT:
             RUNNING = False
+        if event.type == pygame.KEYDOWN:
+            key = event.key
+            if key == pygame.K_LEFT:
+                cannon.direction = -1
+            if key == pygame.K_RIGHT:
+                cannon.direction = 1
+        if event.type == pygame.KEYUP:
+            key = event.key
+            if key == pygame.K_LEFT or key == pygame.K_RIGHT:
+                cannon.direction = 0
+    # TODO change control. Then you going right an change to left, cannon is stopped becouse right is UP and direction is 0
 
 
 def update_objects(cannon: Cannon, balls, targets):
@@ -98,6 +121,8 @@ def update_objects(cannon: Cannon, balls, targets):
         ball.move()
         for target in targets:
             ball.collide(target)
+
+    cannon.move()
 
 
 def draw_objects(screen, cannon: Cannon, balls, targets):
