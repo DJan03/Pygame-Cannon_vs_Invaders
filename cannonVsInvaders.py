@@ -95,8 +95,6 @@ def update_objects(cannon: Cannon, balls, targets):
         for target in targets:
             ball.collide(target)
 
-    cannon.move()
-
 
 def draw_objects(screen, cannon: Cannon, balls, targets):
     for ball in balls:
