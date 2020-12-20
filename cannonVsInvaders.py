@@ -1,10 +1,11 @@
 import pygame
 import random
+from math import sqrt
 
 
 FPS = 60
 WIDTH, HEIGHT = 600, 400
-GRAVITY = 9.8
+GRAVITY = 980
 RUNNING = True
 
 
@@ -39,14 +40,16 @@ class Ball:
         self.shape_radius = Ball.shape_radius
         self.color = Ball.color
 
-    def move(self):
-        pass
+    def move(self, tick):
+        self.x += self.velocity_x * tick
+        self.y += self.velocity_y * tick
+        self.velocity_y += GRAVITY * tick
 
     def collide(self, target: Target):
         pass
 
     def draw(self, screen):
-        pass
+        pygame.draw.circle(screen, self.color, (self.x, self.y), self.shape_radius)
 
     def bounce(self):
         pass
@@ -77,11 +80,16 @@ class Cannon:
         else:
             self.x = new_x
 
-    def aim(self, position):
-        pass
+    def aim(self, mouse_x, mouse_y):
+        self.aim_x, self.aim_y = mouse_x, mouse_y
 
-    def fire(self, balls: Ball):
-        pass
+    def fire(self, balls):
+        x = self.x + self.width // 2
+        y = self.y + self.height // 2
+        length = sqrt((x - self.aim_x) ** 2 + (y - self.aim_y) ** 2)
+        velocity_x = (self.aim_x - x) * self.fire_power / length
+        velocity_y = (self.aim_y - y) * self.fire_power / length
+        balls.append(Ball(x, y, velocity_x, velocity_y))
 
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, (self.x, self.y + self.height // 2, self.width, self.height // 2))         # base of cannon
@@ -95,7 +103,7 @@ def generate_targets(targets, count=10):
         targets.append(Target(x, y))
 
 
-def input_handler(events, cannon: Cannon):
+def input_handler(events, cannon: Cannon, balls):
     global RUNNING
     for event in events:
         if event.type == pygame.QUIT:
@@ -110,15 +118,21 @@ def input_handler(events, cannon: Cannon):
             key = event.key
             if key == pygame.K_LEFT or key == pygame.K_RIGHT:
                 cannon.direction = 0
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                cannon.fire(balls)
+        if event.type == pygame.MOUSEMOTION:
+            x, y = event.pos
+            cannon.aim(x, y)
     # TODO change control. Then you going right an change to left, cannon is stopped becouse right is UP and direction is 0
 
 
-def update_objects(cannon: Cannon, balls, targets):
+def update_objects(cannon: Cannon, balls, targets, tick):
     for target in targets:
         target.move()
 
     for ball in balls:
-        ball.move()
+        ball.move(tick)
         for target in targets:
             ball.collide(target)
 
@@ -144,15 +158,15 @@ def main():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
 
-    cannon = Cannon(WIDTH // 2, HEIGHT * 9 // 10, 5)
+    cannon = Cannon(WIDTH // 2, HEIGHT * 9 // 10, 900)
     balls = []
     targets = []
     generate_targets(targets)
 
     while RUNNING:
-        input_handler(pygame.event.get(), cannon)
+        input_handler(pygame.event.get(), cannon, balls)
 
-        update_objects(cannon, balls, targets)
+        update_objects(cannon, balls, targets, clock.get_time() / 1000)
         draw_objects(screen, cannon, balls, targets)
 
         clock.tick(FPS)
