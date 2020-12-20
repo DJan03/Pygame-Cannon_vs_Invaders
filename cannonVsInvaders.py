@@ -1,4 +1,5 @@
 import pygame
+import random
 
 
 FPS = 60
@@ -12,7 +13,7 @@ class Target:
     color = (255, 255, 0)
     speed = 10
 
-    def __init__(self, x: int, y: int, speed):
+    def __init__(self, x: int, y: int):
         self.x = x
         self.y = y
         self.speed = Target.speed
@@ -75,8 +76,11 @@ class Cannon:
         pass
 
 
-def generate_targets(targets):
-    pass
+def generate_targets(targets, count=10):
+    t = Target.shape_radius
+    for _ in range(count):
+        x, y = random.randint(t, WIDTH - t), random.randint(t, HEIGHT - t)
+        targets.append(Target(x, y))
 
 
 def input_handler(events, cannon: Cannon):
