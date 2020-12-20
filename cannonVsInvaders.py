@@ -64,17 +64,17 @@ class Ball:
 
     def bounce(self):
         if self.x < self.shape_radius:
-            self.velocity_x = abs(self.velocity_x) * 0.9
-            self.velocity_y *= 0.9
+            self.velocity_x = abs(self.velocity_x) * 0.6
+            self.velocity_y *= 0.6
         if self.x > WIDTH - self.shape_radius:
-            self.velocity_x = -abs(self.velocity_x) * 0.9
-            self.velocity_y *= 0.9
+            self.velocity_x = -abs(self.velocity_x) * 0.6
+            self.velocity_y *= 0.6
         if self.y < self.shape_radius:
-            self.velocity_y = abs(self.velocity_y) * 0.9
-            self.velocity_x *= 0.9
+            self.velocity_y = abs(self.velocity_y) * 0.6
+            self.velocity_x *= 0.6
         if self.y > HEIGHT - self.shape_radius:
-            self.velocity_y = -abs(self.velocity_y) * 0.9
-            self.velocity_x *= 0.9
+            self.velocity_y = -abs(self.velocity_y) * 0.6
+            self.velocity_x *= 0.6
 
         if abs(self.velocity_x) < 10:
             self.velocity_x = 0
