@@ -9,7 +9,7 @@ RUNNING = True
 
 
 class Target:
-    shape_radius = 20
+    shape_radius = 10
     color = (255, 255, 0)
     speed = 10
 
@@ -24,11 +24,11 @@ class Target:
         pass
 
     def draw(self, screen):
-        pass
+        pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius)
 
 
 class Ball:
-    shape_radius = 10
+    shape_radius = 5
     color = (255, 0, 0)
 
     def __init__(self, x: int, y: int, velocity_x: float, velocity_y: float):
@@ -79,7 +79,7 @@ class Cannon:
 def generate_targets(targets, count=10):
     t = Target.shape_radius
     for _ in range(count):
-        x, y = random.randint(t, WIDTH - t), random.randint(t, HEIGHT - t)
+        x, y = random.randint(t, WIDTH - t), random.randint(t, HEIGHT // 2 - t)
         targets.append(Target(x, y))
 
 
@@ -101,6 +101,8 @@ def update_objects(cannon: Cannon, balls, targets):
 
 
 def draw_objects(screen, cannon: Cannon, balls, targets):
+    screen.fill((120, 120, 120))
+
     for ball in balls:
         ball.draw(screen)
 
@@ -108,6 +110,8 @@ def draw_objects(screen, cannon: Cannon, balls, targets):
         target.draw(screen)
 
     cannon.draw(screen)
+
+    pygame.display.flip()
 
 
 def main():
